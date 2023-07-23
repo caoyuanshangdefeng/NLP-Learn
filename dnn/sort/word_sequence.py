@@ -3,11 +3,8 @@
 # @Time : 2023-03-26 22:11 
 # @File : word_sequence.py
 # sequence to sequence : many to many的结构
-import os
-import pickle
 
-from settings import SORTRESP, SORTINPUTDATA
-from tqdm import tqdm
+
 
 
 class WordSequence:
@@ -74,10 +71,14 @@ class WordSequence:
         @return:
 
         """
-
+        import time
+        # print('sentence:',sentence,type(sentence))
+        # time.sleep(3600)
+        sentence=sentence
         if len(sentence) > max_len:  # 句子的长度比max_len长的时候
             sentence = sentence[:max_len]  # 保留的部分
         sentence_len = len(sentence)  # 提前计算句子长度统一
+        # print(f"{type(sentence)}--->{sentence_len}--->{sentence}")
         if add_eos:
             sentence += [self.EOS_TAG]
 
@@ -101,18 +102,7 @@ class WordSequence:
 
 
 if __name__ == "__main__":
-    sort_model_resp = os.path.join(SORTRESP, f"sort_ws.pkl")
-    sort_q_path = os.path.join(SORTINPUTDATA, f"q_cuted_words.txt")
-    sort_sim_q_path = os.path.join(SORTINPUTDATA, f"sim_q_cuted_words.txt")
-    ws = WordSequence()
-    #
-    sort_q_content = open(sort_q_path, 'r', encoding='utf-8').readlines()
-    sort_sim_q_content = open(sort_sim_q_path, 'r', encoding='utf-8').readlines()
-    for q_line in tqdm(sort_q_content):
-        ws.fit(q_line.strip().split())
-    for sim_q_line in tqdm(sort_sim_q_content):
-        ws.fit(sim_q_line.strip().split())
+    pass
 
-    ws.build_vocab(min_count=5)
-    print(len(ws))
-    pickle.dump(ws, open(sort_model_resp, 'wb'))
+
+

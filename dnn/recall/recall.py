@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/2 0:39
-# @Author  : 草原上的风
 # @File    : recall.py
 
 # 1.搜索句子向量
@@ -10,11 +8,12 @@ from dnn.recall.sentence_vectors import Sentence2Vector
 from settings import RECALLTOPK, RECALLCLUSTERS
 from pprint import pprint
 
+
 class Recall:
-    def __init__(self, by_word=False,method='fasttext'):
+    def __init__(self, by_word=False, method='fasttext'):
         self.by_word = by_word
         self.method = method
-        self.sentence_vec = Sentence2Vector(self.method,self.by_word)
+        self.sentence_vec = Sentence2Vector(self.method, self.by_word)
         self.vectorizer, self.features_vec, self.lines_cut, self.search_index = self.sentence_vec.built_vectors()
         # print(f"vectorizer : {self.vectorizer}")
         # print(f"features_vec : {self.features_vec}")
@@ -36,16 +35,18 @@ class Recall:
                                                   return_distance=True
                                                   )
 
-        search_results_sort=sorted(search_results,key=lambda item:item[0])
-        pprint(search_results_sort)
+        search_results_sort = sorted(search_results, key=lambda item: item[0])
+        # pprint(search_results_sort)
         filter_results = []
         for result in search_results[0]:
             distance = result[0]
             key = result[1]
             entries = self.sentence_vec.qa_dict[key]['entity']
             if len(set(entries) & set(sentence['entity'])) > 0:
-                filter_results.append(result)
-        if len(filter_results)<1:
+                filter_results.append(key)
+        if len(filter_results) < 1:
             return [i[1] for i in search_results[0]]
         else:
-            return [i[1] for i in filter_results]
+            return filter_results
+if __name__ == '__main__':
+    recall = Recall(by_word=False, method='fasttext')

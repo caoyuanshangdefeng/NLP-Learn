@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/1 23:17
-# @Author  : 草原上的风
-# @File    : sentence_vectors.py
 """recall"""
 import json
 import os
-from settings import QACORPUSPATH, RECALLSEARCHINDEX, RECALLRESP
+from settings import QACORPUSPATH, search_index_bm_25_by_word,search_index_bm_25,search_index_fasttext_by_word,search_index_fasttext,search_index_by_word,search_index
 from sklearn.feature_extraction.text import TfidfVectorizer
 from dnn.recall.BM25vectorizer import BM25Vectorizer
 import pysparnn.cluster_index as ci
@@ -25,19 +22,13 @@ class Sentence2Vector:
         self.qa_dict = json.load(open(QACORPUSPATH, 'r', encoding='utf-8'))
         if method.lower() == 'bm25':
             self.vectorizer = BM25Vectorizer()
-            self.search_index_path = os.path.join(RECALLRESP,
-                                                  'search_index_bm_25_by_word') if self.by_word else os.path.join(
-                RECALLRESP,
-                'search_index_bm_25')
+            self.search_index_path = search_index_bm_25_by_word if self.by_word else search_index_bm_25
         if method.lower() == 'fasttext':
             self.vectorizer = FastTextVectorizer()
-            self.search_index_path = os.path.join(RECALLRESP,
-                                                  'search_index_fasttext_by_word') if self.by_word else os.path.join(
-                RECALLRESP, 'search_index_fasttext')
+            self.search_index_path = search_index_fasttext_by_word if self.by_word else search_index_fasttext
         else:
             self.vectorizer = TfidfVectorizer()
-            self.search_index_path = os.path.join(RECALLRESP, 'search_index_by_word') if self.by_word else os.path.join(
-                RECALLRESP, 'search_index_bm_25')
+            self.search_index_path = search_index_by_word if self.by_word else search_index
 
     def built_vectors(self):
 

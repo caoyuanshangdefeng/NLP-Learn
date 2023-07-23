@@ -1,36 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/16 17:59
-# @Author  : 草原上的风
-# @File    : dataset.py
 
 import os
 
 import torch
 from torch.utils.data import DataLoader, Dataset
-from settings import SORTINPUTDATA, SORTRESP
+from settings import sim_q_cut_words,q_cuted_words,sort_similarity,sort_ws
 import pickle
-from dnn.sort.word_sequence import WordSequence
 
-sort_ws_path = r"E:\learn\AI\nlp_pro\nlp_learn\model\sort\sort_ws.pkl"
-ws = pickle.load(open(sort_ws_path, 'rb'))
+max_len_flag = 20
+ws = pickle.load(open(sort_ws, 'rb'))
 
 
 class DnnSortDataset(Dataset):
     def __init__(self):
-        self.q_lines = open(os.path.join(SORTINPUTDATA, "q_cuted_words.txt"), 'r', encoding='utf-8').readlines()
-        self.sim_q_lines = open(os.path.join(SORTINPUTDATA, "sim_q_cuted_words.txt"), 'r', encoding='utf-8').readlines()
-        assert len(self.q_lines) == len(self.sim_q_lines), "dnn sort data length diff"
+        self.q_lines = open(q_cuted_words, 'r', encoding='utf-8').readlines()
+        self.sim_q_lines = open(sim_q_cut_words, 'r', encoding='utf-8').readlines()
+        # 获取的数据认为前一半是相似的，后一半是不相似的
+        self.target_lines = open(sort_similarity, 'r', encoding='utf-8').readlines()
+
+        assert len(self.q_lines) == len(self.sim_q_lines) == len(self.target_lines), "dnn sort data length diff"
 
         pass
 
     def __getitem__(self, idx):
         q = self.q_lines[idx].split()
         sim_q = self.sim_q_lines[idx].split()
-        print(q, sim_q, len(q), len(sim_q))
+        target = int(self.target_lines[idx])
+        # print(q, sim_q, len(q), len(sim_q))
+        # len_q = len(q) if len(q) < max_len_flag else max_len_flag
+        # len_sim_q = len(sim_q) if len(sim_q) < max_len_flag else max_len_flag
 
-        return q, sim_q, len(q), len(sim_q)
-        pass
+        # return q, sim_q,target, len_q, len_sim_q
+        return q, sim_q, target
 
     def __len__(self):
         return len(self.q_lines)
@@ -45,14 +47,11 @@ def collate_fn(batch):
     """
     batch = sorted(batch, key=lambda x: x[-2], reverse=True)
     print(batch)
-    input, target, input_length, target_length = zip(*batch)
-    input = [ws.transform(i, max_len=20) for i in input]
-    input = torch.LongTensor(input)
-    target = [ws.transform(i, max_len=20) for i in target]
+    input1, input2, target = zip(*batch)
+    input1 = torch.LongTensor([ws.transform(i, max_len=max_len_flag) for i in input1])
+    input2 = torch.LongTensor([ws.transform(i, max_len=max_len_flag) for i in input2])
     target = torch.LongTensor(target)
-    input_length = torch.LongTensor(input_length)
-    target_length = torch.LongTensor(target_length)
-    return input, target, input_length, target_length
+    return input1, input2, target
 
 
 data_loader = DataLoader(dataset=DnnSortDataset(),

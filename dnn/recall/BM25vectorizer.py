@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/3 23:11
-# @Author  : 草原上的风
 # @File    : BM25vectorizer.py
 import warnings
 

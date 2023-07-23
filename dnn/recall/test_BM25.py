@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/3 23:45
-# @Author  : 草原上的风
-# @File    : test_BM25.py
 from dnn.recall.BM25vectorizer import BM25Vectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 bm25_vec=BM25Vectorizer()
